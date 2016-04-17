@@ -20,16 +20,12 @@
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
-
-#ifdef __CORDOVA_4_0_0
-    #import <Cordova/CDVUIWebViewDelegate.h>
-#else
-    #import <Cordova/CDVWebViewDelegate.h>
-#endif
+#import <Cordova/CDVWebViewDelegate.h>
 
 @class CDVInAppBrowserViewController;
 
 @interface CDVInAppBrowser : CDVPlugin {
+    BOOL _injectedIframeBridge;
 }
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
@@ -48,6 +44,7 @@
 @property (nonatomic, assign) BOOL location;
 @property (nonatomic, assign) BOOL toolbar;
 @property (nonatomic, copy) NSString* closebuttoncaption;
+@property (nonatomic, copy) NSString* sharebuttoncaption;
 @property (nonatomic, copy) NSString* toolbarposition;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
@@ -73,17 +70,12 @@
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
     CDVInAppBrowserOptions *_browserOptions;
-    
-#ifdef __CORDOVA_4_0_0
-    CDVUIWebViewDelegate* _webViewDelegate;
-#else
     CDVWebViewDelegate* _webViewDelegate;
-#endif
-    
 }
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* closeButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* shareButton;
 @property (nonatomic, strong) IBOutlet UILabel* addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* backButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* forwardButton;
@@ -99,6 +91,7 @@
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
+- (void)setShareButtonTitle:(NSString*)title;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
@@ -109,4 +102,5 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
+
 
