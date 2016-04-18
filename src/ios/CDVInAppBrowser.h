@@ -48,7 +48,11 @@
 @property (nonatomic, assign) BOOL toolbar;
 @property (nonatomic, copy) NSString* closebuttoncaption;
 @property (nonatomic, copy) NSString* sharebuttoncaption;
+@property (nonatomic, copy) NSString* historybuttoncaption;
 @property (nonatomic, copy) NSString* toolbarposition;
+@property (nonatomic, copy) NSString* toolbarbackgroundcolor;
+@property (nonatomic, copy) NSString* toolbartextcolor;
+@property (nonatomic, copy) NSString* urlhistory;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 
@@ -67,7 +71,7 @@
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIPopoverControllerDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
@@ -83,12 +87,17 @@
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* closeButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* shareButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* historyButton;
 @property (nonatomic, strong) IBOutlet UILabel* addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* backButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* forwardButton;
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView* spinner;
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
+@property (nonatomic, strong) IBOutlet UIPickerView* historyPicker;
+@property (nonatomic, strong) IBOutlet UIPopoverController* historyPopover;
 
+@property (nonatomic, copy) NSArray* historyData;
+@property (nonatomic) int historyIndex;
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
@@ -99,6 +108,8 @@
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 - (void)setShareButtonTitle:(NSString*)title;
+- (void)setHistoryButtonTitle:(NSString*)title;
+- (UIColor *) colorFromHexRGB:(NSString *) inColorString;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
