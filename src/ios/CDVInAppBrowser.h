@@ -96,8 +96,7 @@
 @property (nonatomic, strong) IBOutlet UIPickerView* historyPicker;
 @property (nonatomic, strong) IBOutlet UIPopoverController* historyPopover;
 
-@property (nonatomic, copy) NSArray* historyData;
-@property (nonatomic) int historyIndex;
+@property (nonatomic) NSMutableArray* historyData;
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;

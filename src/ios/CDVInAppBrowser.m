@@ -458,9 +458,15 @@
 
 - (void)pickerView:(UIPickerView *)pV didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     // load the url selected in historyData
-    [self navigateTo:[NSURL URLWithString:((NSDictionary *) self.historyData[row])[@"url"]]];
+    NSDictionary *dictionary = (NSDictionary *)historyData[row];
+    [self navigateTo:[NSURL URLWithString:dictionary[@"url"]]];
     [self.historyPopover dismissPopoverAnimated:true];
-    self.historyIndex = row;
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:historyData.count];
+    [array addObject:dictionary];
+    for (NSDictionary *dictionary1 in historyData) {
+        if (dictionary1 != dictionary) { [array addObject:dictionary1]; };
+    }
+    historyData = array;
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
@@ -468,11 +474,11 @@
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    return [self.historyData count];
+    return [historyData count];
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return ((NSDictionary *) self.historyData[row])[@"label"];
+    return ((NSDictionary *) historyData[row])[@"label"];
 }
 
 
@@ -567,7 +573,6 @@
     self.historyButton.enabled = YES;
 
     self.historyPicker = nil;
-    self.historyIndex = 0;
 
     UIBarButtonItem *flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
@@ -631,11 +636,21 @@
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
     self.forwardButton.enabled = YES;
     self.forwardButton.imageInsets = UIEdgeInsetsZero;
+    if (_browserOptions.toolbartextcolor) {
+        self.forwardButton.tintColor = [self colorFromHexRGB:_browserOptions.toolbartextcolor];
+    } else {
+        self.forwardButton.tintColor = [UIColor colorWithRed:255.0f / 255.0f green:255.0f / 255.0f blue:255.0f / 255.0f alpha:1];
+    }
 
     NSString *backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
+    if (_browserOptions.toolbartextcolor) {
+        self.backButton.tintColor = [self colorFromHexRGB:_browserOptions.toolbartextcolor];
+    } else {
+        self.backButton.tintColor = [UIColor colorWithRed:255.0f / 255.0f green:255.0f / 255.0f blue:255.0f / 255.0f alpha:1];
+    }
 
     [self.toolbar setItems:@[self.shareButton, self.historyButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton, fixedSpaceButton, self.closeButton]];
 
@@ -870,7 +885,9 @@
         NSError *error = nil;
         NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];
         if (jsonArray) {
-            self.historyData = jsonArray;
+            if (!historyData) {
+                historyData = [[NSMutableArray alloc]initWithArray:jsonArray];
+            }
             self.historyPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, 320, 216)];
             self.historyPicker.backgroundColor = [UIColor clearColor];
             self.historyPicker.showsSelectionIndicator = YES;
@@ -885,7 +902,6 @@
                 self.historyPopover.popoverContentSize = self.historyPicker.frame.size;
                 [self.historyPopover presentPopoverFromBarButtonItem:self.historyButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
                 self.historyPopover.delegate = self;
-                [self.historyPicker selectRow:self.historyIndex inComponent:1 animated:false];
             }
             else {
                 [self presentViewController:pickerController animated:true completion:nil];
