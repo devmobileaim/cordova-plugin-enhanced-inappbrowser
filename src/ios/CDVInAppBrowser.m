@@ -459,7 +459,8 @@
 - (void)pickerView:(UIPickerView *)pV didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     // load the url selected in historyData
     NSDictionary *dictionary = (NSDictionary *)historyData[row];
-    [self navigateTo:[NSURL URLWithString:dictionary[@"url"]]];
+    NSString *url = dictionary[@"url"];
+    [self navigateTo:[NSURL URLWithString:url]];
     [self.historyPopover dismissPopoverAnimated:true];
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:historyData.count];
     [array addObject:dictionary];
@@ -864,23 +865,31 @@
     });
 }
 
-- (void)share {
+- (void)share
+{
     NSArray *objectsToShare = @[currentURL];
 
-    UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:objectsToShare applicationActivities:nil];
+    if ([currentURL.absoluteString hasPrefix:@"file"]) {
+        self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:currentURL];
 
-    if ([activityVC respondsToSelector:@selector(popoverPresentationController)]) {
-        // iOS8
-        activityVC.popoverPresentationController.sourceView = self.toolbar;
+        [self.documentInteractionController presentOpenInMenuFromBarButtonItem:_shareButton animated:true];
+    } else {
+        UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:objectsToShare applicationActivities:nil];
+
+
+        if ([activityVC respondsToSelector:@selector(popoverPresentationController)]) {
+            // iOS8
+            activityVC.popoverPresentationController.sourceView = self.toolbar;
+        }
+
+        [self presentViewController:activityVC animated:YES completion:nil];
     }
-
-    [self presentViewController:activityVC animated:YES completion:nil];
 }
 
 - (void)history {
     if (_browserOptions.urlhistory) {
         NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:[_browserOptions.urlhistory stringByReplacingOccurrencesOfString:@"_" withString:@"="] options:0];
-        NSString *urlJSON = [[NSString alloc] initWithData:decodedData encoding:nil];
+        NSString *urlJSON = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
         NSData *jsonData = [urlJSON dataUsingEncoding:NSUTF8StringEncoding];
         NSError *error = nil;
         NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&error];

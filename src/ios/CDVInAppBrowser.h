@@ -100,6 +100,7 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
+@property (nonatomic) UIDocumentInteractionController *documentInteractionController;
 
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
